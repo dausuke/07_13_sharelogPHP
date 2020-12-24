@@ -1,0 +1,134 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@600&display=swap');
+html{
+    height: 100%;
+}
+body{
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+section{
+    position: relative;
+}
+h1{
+    font-size: 3rem;
+    font-family: 'Roboto Slab', serif;
+}
+main{
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+form{
+    height: 100%;
+}
+.signin{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+.signin-content{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 50%;
+    height: 60%;
+    padding: 0;
+}
+.alert{
+    display: none;
+    font-size: 12px;
+    color: rgb(99, 100, 100);
+}
+.signin-content input{
+    height: 2rem;
+    width: 15rem;
+    margin-top: 2rem;
+
+}
+button{
+    margin-top: 3rem;
+    margin-bottom: 1rem;
+    height: 3rem;
+    width: 7rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    padding: 0.25em 0.5em;
+    text-decoration: none;
+    color: #FFF;
+    background: #3f51b5;
+    transition: .4s;
+    border: none;
+}
+button:hover {
+  background: #1ec7bb;
+}
+#email{
+    margin-bottom: 0;
+}
+.loader{
+    height: 100%;
+    width: 100%;
+    z-index: 5;
+    background-color: rgba(44, 43, 43, 0.274);
+    position: fixed;
+    overflow: auto;
+    top: 0;
+}
+.loader p{
+    font-size: 1.5rem;
+    font-family: 'Roboto Slab', serif;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+}
+#modalopen{
+    height: 2rem;
+    width: 5rem;
+    font-size: 1rem;
+    display: block;
+    position: absolute;
+    top: 1rem;
+    right: 5rem;
+}
+#modal{
+    display: none;
+    height: 100%;
+    width: 100%;
+    z-index: 5;
+    background-color: rgba(44, 43, 43, 0.274);
+    position: fixed;
+    overflow: auto;
+    top: 0;
+}
+.sign-up{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.none{
+    display: none;
+}
+#fadein-content{
+    display: none;
+}
+.signup-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: white;
+    width: 80%;
+    height: 100%;
+    margin-top: 10%;
+}
+.signup-content input{
+    height: 1.5rem;
+    width: 15rem;
+    margin-bottom: 1rem;
+}
