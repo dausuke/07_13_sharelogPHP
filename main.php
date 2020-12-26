@@ -1,4 +1,9 @@
 <?php
+session_start();
+//ユーザー情報取得
+$uid = $_SESSION["uid"];
+// var_dump($uid);
+// exit();
 // DB接続情報
 $dbn = 'mysql:dbname=gsacf_d07_13;charset=utf8;port=3306;host=localhost';
 $user = 'root';
@@ -27,9 +32,11 @@ if ($status == false) {
     // データ表示
     $result = $stmt->fetchAll(PDO::PARAM_STR);
     $json_read_data = json_encode($result, JSON_UNESCAPED_UNICODE);
-    // var_dump($json_read_data);
+    // var_dump($result[0]['shopname']);
     // exit();
+    
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -46,6 +53,9 @@ if ($status == false) {
 
 <body>
     <script src="main.js"></script>
+    <script src="https://cdn.geolonia.com/community-geocoder.js"></script>
+    <script src='https://www.bing.com/api/maps/mapcontrol?key=' async defer>
+    </script>
     <header>
         <h1>sharelog</h1>
         <span id="signout">signout</span>
@@ -101,8 +111,18 @@ if ($status == false) {
         </div>
     </main>
     <script>
-        const dataArray = <?= $json_read_data ?>;
-        console.log(dataArray)
+        const dataArray = <?= $json_read_data ?>; //DBのデータ
+        console.log(dataArray);
+        const uid = <?= $uid ?>; //ユーザーID
+        //現在地の緯度経度取得用の配列
+        const latArray = [];
+        const lngArray = [];
+        //保存した店の緯度経度を格納するための配列
+        const latArraydb = [];
+        const lngArraydb = [];
+        const pushpinsinfo = []; //ピンの情報用の配列
+        const pushpins = [];
+
         //ホーム画面：保存されているデータ表示
         for (let i = 0; i < dataArray.length; i++) { //保存しているすべてのデータ表示
             const memoTag = `
@@ -115,13 +135,15 @@ if ($status == false) {
                     <ul>
                         <li>店　　　名：</li>
                         <li>エ　リ　ア：</li>
+                        <li>　最寄り駅：</il>
                         <li>連　絡　先：</li>
                         <li>カテゴリー：</li>
                         <li>評　　　価：</li>
                     </ul>
                     <ul>
-                        <li id="listkname${i}"></li>
-                        <li id="listkarea${i}"></li>
+                        <li id="listname${i}"></li>
+                        <li id="listarea${i}"></li>
+                        <li id="liststaition${i}"></li>
                         <li id="listpnumber${i}"></li>
                         <li id="listcategory${i}"></li>
                         <li id="listevaluation${i}"></li>
@@ -134,11 +156,12 @@ if ($status == false) {
             </article>
                 `;
             //#listに.lsititemを追加
-            //firebaseに保存したデータを表示
+            //DBに保存した全データを表示
             $('#timeline').append(memoTag);
-            $('#listkname' + i).text(dataArray[i].shopname);
+            $('#listname' + i).text(dataArray[i].shopname);
             $('#listgetday' + i).text(dataArray[i].getday);
-            $('#listkarea' + i).text(dataArray[i].area);
+            $('#listarea' + i).text(dataArray[i].area);
+            $('#liststaition' + i).text(dataArray[i].station);
             $('#listcategory' + i).text(dataArray[i].category);
             $('#listpnumber' + i).text(dataArray[i].pnumber);
             $('#listevaluation' + i).text(dataArray[i].evaluation);
@@ -157,13 +180,15 @@ if ($status == false) {
                     <ul>
                         <li>店　　　名：</li>
                         <li>エ　リ　ア：</li>
+                        <li>　最寄り駅：</il>
                         <li>連　絡　先：</li>
                         <li>カテゴリー：</li>
                         <li>評　　　価：</li>
                     </ul>
                     <ul id = "logdata">
-                        <li id="mypagelistkname${i}"></li>
-                        <li id="mypagelistkarea${i}"></li>
+                        <li id="mypagelistname${i}"></li>
+                        <li id="mypagelistarea${i}"></li>
+                        <li id="mypagestation${i}"></li>
                         <li id="mypagelistpnumber${i}"></li>
                         <li id="mypagelistcategory${i}"></li>
                         <li id="mypagelistevaluation${i}"></li>
@@ -175,19 +200,146 @@ if ($status == false) {
 
                 </div>
             </article>
-                `;
+            `;
             //#listに.lsititemを追加
-            //firebaseに保存したデータを表示
-            $('#mypagetimeline').append(memoTag);
-            $('#mypagelistkname' + i).text(dataArray[i].shopname);
-            $('#mypagelistgetday' + i).text(dataArray[i].getday);
-            $('#mypagelistkarea' + i).text(dataArray[i].area);
-            $('#mypagelistcategory' + i).text(dataArray[i].category);
-            $('#mypagelistpnumber' + i).text(dataArray[i].pnumber);
-            $('#mypagelistevaluation' + i).text(dataArray[i].evaluation);
-            $('#mypagelistfreetext' + i).text(dataArray[i].freetext);
+            //ログインしているユーザーのidとDBに保存しているuidが一致しているデータを表示
+            if (uid == dataArray[i].userid) {
+                $('#mypagetimeline').append(memoTag);
+                $('#mypagelistname' + i).text(dataArray[i].shopname);
+                $('#mypagelistgetday' + i).text(dataArray[i].getday);
+                $('#mypagelistarea' + i).text(dataArray[i].area);
+                $('#mypagestation' + i).text(dataArray[i].station);
+                $('#mypagelistcategory' + i).text(dataArray[i].category);
+                $('#mypagelistpnumber' + i).text(dataArray[i].pnumber);
+                $('#mypagelistevaluation' + i).text(dataArray[i].evaluation);
+                $('#mypagelistfreetext' + i).text(dataArray[i].freetext);
+            }
         };
+        console.log(latArraydb);
+        console.log(lngArraydb);
+        //map表示
+        //ローカルサーチAPIで取得した住所から座標情報取得
+        dataArray.forEach(function(value) {
+            const address = value.shopaddress;
+            getLatLng(address, function(latlng) {
+                const lattag = latlng.lat;
+                const lngtag = latlng.lng;
+                console.log(lattag)
+                latArraydb.push(lattag);
+                lngArraydb.push(lngtag);
+            });
+        });
+
+
+
+        //保存されている位置情報のマップピン表示用
+        dataArray.forEach(function(value, index) {
+            const infotag = {
+                id: value.userid,
+                latitude: latArraydb,
+                longitude: lngArraydb,
+                title: value.shopname,
+                description: value.freetext
+            };
+            pushpinsinfo.push(infotag);
+        });
+
+        //map表示用に使用する変数
+        let map;
+        console.log(pushpinsinfo)
+
+        function setinfopin() {
+
+            //infoboxは一つ作成して再利用する
+            var infobox = new Microsoft.Maps.Infobox(new Microsoft.Maps.Location(0, 0), {
+                visible: false,
+                autoAlignment: true
+            });
+            infobox.setMap(map);
+
+            //pushpinの情報を作成
+            pushpinsinfo.forEach(function(info) {
+                if (uid == info.id) {
+                    var pushpin = new Microsoft.Maps.Pushpin(new Microsoft.Maps.Location(info.latitude, info.longitude), {
+                        color: 'red',
+                        visible: 'ture',
+                    });
+                    console.log(info)
+                    pushpin.metadata = info;
+                    Microsoft.Maps.Events.addHandler(pushpin, 'click', function(args) {
+                        infobox.setOptions({
+                            location: args.target.getLocation(),
+                            title: args.target.metadata.title,
+                            description: args.target.metadata.description,
+                            visible: true
+                        });
+                    });
+                    pushpins.push(pushpin);
+                }
+            });
+        };
+        // 現在地を取得するときのオプション
+        const option = {
+            enableHighAccuracy: true,
+            maximumAge: 20000,
+            timeout: 100000000
+        };
+
+        //ピンの生成(現在地)
+        function pushPin(lat, lng, map) {
+            const location = new Microsoft.Maps.Location(lat, lng);
+            const pin = new Microsoft.Maps.Pushpin(location, {
+                color: 'navy',
+                visible: 'ture',
+            });
+            map.entities.push(pin);
+            map.entities.push(pushpins);
+        };
+
+        // 現在地の取得に成功したときの関数
+        function mapsInit(position) {
+            // console.log(position)
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            map = new Microsoft.Maps.Map('#map', {
+                center: {
+                    latitude: lat,
+                    longitude: lng
+                },
+                zoom: 15,
+            });
+            latArray.push(lat);
+            lngArray.push(lng);
+            setinfopin();
+            pushPin(lat, lng, map);
+        };
+
+        // 現在位置の取得に失敗したの実行する関数
+        function showError(error) {
+            let e = "";
+            if (error.code == 1) {
+                e = "位置情報が許可されてません";
+            }
+            if (error.code == 2) {
+                e = "現在位置を特定できません";
+            }
+            if (error.code == 3) {
+                e = "位置情報を取得する前にタイムアウトになりました";
+            }
+            alert("error：" + e);
+        }
+
+        // 位置情報を取りにいく処理
+        function getPosition() {
+            navigator.geolocation
+                .getCurrentPosition(mapsInit, showError, option);
+        };
+
+        window.onload = function() {
+            getPosition();
+        }
     </script>
+
 </body>
 
 </html>

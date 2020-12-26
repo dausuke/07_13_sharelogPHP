@@ -1,4 +1,5 @@
 <?php
+session_start();
 
 //データ受信
 $email = $_POST['email'];
@@ -22,7 +23,8 @@ try {
 }
 
 //ログイン情報取得
-$sql = 'SELECT email,userpassword FROM userdata_table';
+$sql = 'SELECT id,email,userpassword FROM userdata_table';
+
 $stmt = $pdo->prepare($sql);
 //SQL実行
 $status = $stmt->execute();
@@ -33,20 +35,22 @@ if ($status == false) {
     exit('sqlError:' . $error[2]);
 } else {
     // データ表示
-    $read_data = $stmt->fetchAll(PDO::PARAM_STR);
+    $user_data = $stmt->fetchAll(PDO::PARAM_STR);
 }
 
 //ログイン認証
 //入力されたアドレス、パスワードの配列がDB内にあれば変数judgeにtrueなければfalseを格納
-$result = in_array($signin_data, $read_data);
-
-if ($result) {
+//ログイン成功時、ＤＢ内のＩＤをセッション情報に保存
+// var_dump($user_data);
+// exit();
+if ($email === $user_data[0]['email'] && $password === $user_data[0]['userpassword']) {
+    session_regenerate_id(TRUE);
+    //セッション情報保存
+    $_SESSION['uid'] = $user_data[0]['id'];
     $judge = 'true';
 } else {
     $judge = 'false';
-}
-// var_dump($judge);
-// exit();
+} 
 ?>
 
 <!DOCTYPE html>
@@ -56,7 +60,7 @@ if ($result) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <link rel="stylesheet" href="../signin_css/signin.css">
+    <link rel="stylesheet" href="../css/signin.css">
     <title></title>
 </head>
 

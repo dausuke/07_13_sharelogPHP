@@ -1,3 +1,16 @@
+<?php
+session_start();
+
+//セッション変数をクリア
+$_SESSION = array();
+
+//クッキーに登録されているセッションidの情報を削除
+if (ini_get("session.use_cookies")) {
+    setcookie(session_name(), '', time() - 42000, '/');
+}
+//セッションを破棄
+session_destroy();
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,7 +18,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <link rel="stylesheet" href="signin_css/signin.css">
+    <link rel="stylesheet" href="css/signin.css">
     <title>SignIn-form</title>
 </head>
 

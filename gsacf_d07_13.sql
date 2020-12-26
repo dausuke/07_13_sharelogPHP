@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- ホスト: 127.0.0.1
--- 生成日時: 2020-12-24 10:32:13
+-- 生成日時: 2020-12-26 01:26:51
 -- サーバのバージョン： 10.4.17-MariaDB
 -- PHP のバージョン: 8.0.0
 
@@ -29,9 +29,12 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `content_table` (
   `id` int(100) NOT NULL,
+  `userid` int(100) NOT NULL,
   `shopname` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `area` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `pnumber` int(100) NOT NULL,
+  `pnumber` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `station` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `shopaddress` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `evaluation` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `category` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `freetext` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -42,8 +45,9 @@ CREATE TABLE `content_table` (
 -- テーブルのデータのダンプ `content_table`
 --
 
-INSERT INTO `content_table` (`id`, `shopname`, `area`, `pnumber`, `evaluation`, `category`, `freetext`, `getday`) VALUES
-(1, 'test', 'testtest', 987654321, '★★', 'ディナー', 'test', '2020-12-24 10:32:55');
+INSERT INTO `content_table` (`id`, `userid`, `shopname`, `area`, `pnumber`, `station`, `shopaddress`, `evaluation`, `category`, `freetext`, `getday`) VALUES
+(23, 1, 'Bshop博多店', '福岡', '092-409-6835', '博多駅', '福岡県福岡市博多区博多駅中央街１−１', '★★★★★', 'ファッション', 'ビショップ', '2020-12-25 23:30:04'),
+(24, 1, 'Bshop天神ソラリアプラザ店', '福岡', '092-791-1690', '西鉄福岡駅', '福岡県福岡市中央区天神２丁目２−４３', '★★★★★', 'ファッション', 'ビショップ天神ソラリア', '2020-12-25 23:37:25');
 
 -- --------------------------------------------------------
 
@@ -130,7 +134,7 @@ ALTER TABLE `userdata_table`
 -- テーブルの AUTO_INCREMENT `content_table`
 --
 ALTER TABLE `content_table`
-  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- テーブルの AUTO_INCREMENT `todo_table`
