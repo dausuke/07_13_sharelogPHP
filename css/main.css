@@ -50,11 +50,11 @@ main{
 /* 画面切り替えのため（表示・非表示） */
 .content {
     display: none;
-    width: 40%;
+    width: 50%;
 }
 .content.active {
     display: block;
-    width: 40%;
+    width: 50%;
     position: relative;
     left: 30%;
 }
@@ -128,7 +128,7 @@ main{
     left: 30%;
 }
 .timelinecontent ul:nth-child(4){
-    left: 54%;
+    left: 60%;
 }
 .timelinecontent ul:nth-child(4) li{
     margin: 0;

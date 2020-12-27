@@ -28,7 +28,7 @@ $json = json_decode($json, JSON_UNESCAPED_UNICODE);
 // exit();
 
 foreach ($json['Feature'] as $item) {
-    $address = $item['Property']['Address'];
+    $position = $item['Geometry']['Coordinates'];
     $pnumber = $item['Property']['Tel1'];
     $stationname = $item['Property']['Station'][0]['Name'] . '駅';
     $name = $item['Name'];
@@ -53,7 +53,7 @@ try {
     exit();
 }
 
-$sql = 'INSERT INTO content_table(id,userid,shopname,area,pnumber,station,shopaddress,evaluation,category,freetext,getday) VALUES(NULL,:userid,:shopname,:area,:pnumber,:stationname,:shopaddress,:evaluation,:category,:freetext,sysdate())';
+$sql = 'INSERT INTO content_table(id,userid,shopname,area,pnumber,station,position,evaluation,category,freetext,getday) VALUES(NULL,:userid,:shopname,:area,:pnumber,:stationname,:position,:evaluation,:category,:freetext,sysdate())';
 $stmt = $pdo->prepare($sql);
 //バインド変数設定
 $stmt->bindValue(':userid', $userid, PDO::PARAM_STR);
@@ -61,7 +61,7 @@ $stmt->bindValue(':shopname', $shopname, PDO::PARAM_STR);
 $stmt->bindValue(':area', $area, PDO::PARAM_STR);
 $stmt->bindValue(':pnumber', $pnumber, PDO::PARAM_STR);
 $stmt->bindValue(':stationname', $stationname, PDO::PARAM_STR);
-$stmt->bindValue(':shopaddress', $address, PDO::PARAM_STR);
+$stmt->bindValue(':position', $position, PDO::PARAM_STR);
 $stmt->bindValue(':evaluation', $evaluation, PDO::PARAM_STR);
 $stmt->bindValue(':category', $category, PDO::PARAM_STR);
 $stmt->bindValue(':freetext', $freetext, PDO::PARAM_STR);

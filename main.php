@@ -34,7 +34,7 @@ if ($status == false) {
     $json_read_data = json_encode($result, JSON_UNESCAPED_UNICODE);
     // var_dump($result[0]['shopname']);
     // exit();
-    
+
 }
 
 ?>
@@ -54,7 +54,7 @@ if ($status == false) {
 <body>
     <script src="main.js"></script>
     <script src="https://cdn.geolonia.com/community-geocoder.js"></script>
-    <script src='https://www.bing.com/api/maps/mapcontrol?key=' async defer>
+    <script src='https://www.bing.com/api/maps/mapcontrol?key=_' async defer>
     </script>
     <header>
         <h1>sharelog</h1>
@@ -67,7 +67,7 @@ if ($status == false) {
             <div id="timeline"></div>
             <ul class="tab">
                 <li class="active"><a href="#mypage" class="buttom3d">Mypage</a></li>
-                <li><a href="#shopsarch" class="buttom3d">Shop-Sarch</a></li>
+                <!-- <li><a href="#shopsarch" class="buttom3d">Shop-Sarch</a></li> -->
                 <li><a href="#mymap" class="buttom3d">mymap</a></li>
             </ul>
         </div>
@@ -89,7 +89,7 @@ if ($status == false) {
             <p>マイマップ</p>
             <div id=map class="map"></div>
         </div>
-        <!-- 検索画面 -->
+        <!-- 検索画面
         <div class="content" id="shopsarch">
             <div class="kensakudata">
                 <p>リストを検索</p>
@@ -108,18 +108,47 @@ if ($status == false) {
             <ul class="tab">
                 <li><a href="#home" class="buttom3d">home</a></li>
             </ul>
-        </div>
+        </div> -->
     </main>
     <script>
         const dataArray = <?= $json_read_data ?>; //DBのデータ
         console.log(dataArray);
+        const read_position = [];
+        dataArray.forEach(function(value) {
+            const read_positiontag = value.position;
+            read_position.push(read_positiontag);
+        });
+        console.log(read_position);
         const uid = <?= $uid ?>; //ユーザーID
         //現在地の緯度経度取得用の配列
         const latArray = [];
         const lngArray = [];
+
         //保存した店の緯度経度を格納するための配列
-        const latArraydb = [];
-        const lngArraydb = [];
+        const tagintArray = [];
+        const tagstrArray = [];
+
+        //緯度経度が1つの文字列で返って来てるので「,」で分割し配列tagstrArr配列に格納
+        read_position.forEach(function(value) {
+            const tagstr = value.split(',');
+            tagstrArray.push(tagstr)
+        });
+        //緯度経度の配列をFloat型に変換
+        tagstrArray.forEach(function(value, index) {
+            value.forEach(function(latlng) {
+                const tagint = parseFloat(latlng)
+                tagintArray.push(tagint);
+            });
+        });
+        //配列を分割する関数
+        const arrayChunk = ([...array], size = 1) => {
+            return array.reduce((acc, value, index) => index % size ? acc : [...acc, array.slice(index, index + size)], []);
+        }
+        //緯度が格納された配列と経度が格納された配列に2分割
+        const posiArraydb = arrayChunk(tagintArray, 2);
+
+        console.log(tagstrArray)
+        console.log(posiArraydb)
         const pushpinsinfo = []; //ピンの情報用の配列
         const pushpins = [];
 
@@ -215,16 +244,14 @@ if ($status == false) {
                 $('#mypagelistfreetext' + i).text(dataArray[i].freetext);
             }
         };
-        console.log(latArraydb);
-        console.log(lngArraydb);
-        //map表示
-        //ローカルサーチAPIで取得した住所から座標情報取得
+        map表示
+        ローカルサーチAPIで取得した住所から座標情報取得
         dataArray.forEach(function(value) {
             const address = value.shopaddress;
             getLatLng(address, function(latlng) {
                 const lattag = latlng.lat;
                 const lngtag = latlng.lng;
-                console.log(lattag)
+                console.log(latlng)
                 latArraydb.push(lattag);
                 lngArraydb.push(lngtag);
             });
@@ -236,11 +263,12 @@ if ($status == false) {
         dataArray.forEach(function(value, index) {
             const infotag = {
                 id: value.userid,
-                latitude: latArraydb,
-                longitude: lngArraydb,
+                latitude: posiArraydb[index][0],
+                longitude: posiArraydb[index][1],
                 title: value.shopname,
                 description: value.freetext
             };
+            console.log(posiArraydb[index][0])
             pushpinsinfo.push(infotag);
         });
 
@@ -259,12 +287,12 @@ if ($status == false) {
 
             //pushpinの情報を作成
             pushpinsinfo.forEach(function(info) {
+                console.log(info)
                 if (uid == info.id) {
                     var pushpin = new Microsoft.Maps.Pushpin(new Microsoft.Maps.Location(info.latitude, info.longitude), {
                         color: 'red',
                         visible: 'ture',
                     });
-                    console.log(info)
                     pushpin.metadata = info;
                     Microsoft.Maps.Events.addHandler(pushpin, 'click', function(args) {
                         infobox.setOptions({
